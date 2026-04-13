@@ -84,18 +84,18 @@ export default function CastingForm({ onTypeSelect, hideSections, onSubmitWithDa
 
   const formValues = watch();
 
-  const cloudinaryContext = [
-    `prenom=${formValues.prenom || ''}`,
-    `nom=${formValues.nom || ''}`,
-    `age=${String(formValues.age || '')}`,
-    `ville=${formValues.ville || ''}`,
-    `email=${formValues.email || ''}`,
-    `telephone=${formValues.telephone || ''}`,
-    `instagram=${formValues.instagram || ''}`,
-    `tiktok=${formValues.tiktok || ''}`,
-    `youtube=${formValues.youtube || ''}`,
-    `types=${selectedTypes.join(',')}`,
-  ].join('|');
+  const cloudinaryContext: Record<string, string> = {
+    prenom: formValues.prenom || '',
+    nom: formValues.nom || '',
+    age: String(formValues.age || ''),
+    ville: formValues.ville || '',
+    email: formValues.email || '',
+    telephone: formValues.telephone || '',
+    instagram: formValues.instagram || '',
+    tiktok: formValues.tiktok || '',
+    youtube: formValues.youtube || '',
+    types: selectedTypes.join(','),
+  };
 
   const cloudinaryTags = ['casting', ...selectedTypes, ...(formValues.ville ? [formValues.ville] : [])];
 
