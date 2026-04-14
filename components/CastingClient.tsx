@@ -1,26 +1,21 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import CastingForm, { type CastingType, type CandidateInfo } from './CastingForm';
 import CastingVideo from './CastingVideo';
 
 type Step = 'mode' | 'video-type' | 'video-info' | 'video-record' | 'image-form';
 
-const VIDEO_TYPES: {
-  value: CastingType;
-  emoji: string;
-  label: string;
-  hint: string;
-  plus18: boolean;
-}[] = [
-  { value: 'modele',       emoji: '👗', label: 'Modèle',              hint: 'Mode, publicité, défilé',                  plus18: false },
-  { value: 'influenceuse', emoji: '✨', label: 'Influenceuse',         hint: 'Réseaux sociaux & contenu digital',         plus18: false },
-  { value: 'hotesse',      emoji: '🎤', label: 'Hôtesse',             hint: 'Événements, salons, galas',                 plus18: false },
-  { value: 'lingerie',     emoji: '🌸', label: 'Maillots / Lingerie', hint: 'Beachwear, lingerie, boudoir',              plus18: true  },
-  { value: 'glamour',      emoji: '💋', label: 'Modèle Glamour',      hint: 'Éditoriaux audacieux, campagnes boldfaces', plus18: true  },
+const VIDEO_TYPE_KEYS: { value: CastingType; emoji: string; plus18: boolean }[] = [
+  { value: 'modele',       emoji: '👗', plus18: false },
+  { value: 'influenceuse', emoji: '✨',  plus18: false },
+  { value: 'hotesse',      emoji: '🎤', plus18: false },
+  { value: 'lingerie',     emoji: '🌸', plus18: true  },
+  { value: 'glamour',      emoji: '💋', plus18: true  },
 ];
 
-function BackButton({ onClick }: { onClick: () => void }) {
+function BackButton({ onClick, label }: { onClick: () => void; label: string }) {
   return (
     <button
       type="button"
@@ -30,18 +25,25 @@ function BackButton({ onClick }: { onClick: () => void }) {
       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
       </svg>
-      Retour
+      {label}
     </button>
   );
 }
 
 export default function CastingClient() {
+  const t = useTranslations('casting_page');
   const [step, setStep] = useState<Step>('mode');
   const [videoTypes, setVideoTypes] = useState<CastingType[]>(['modele']);
   const [pendingTypes, setPendingTypes] = useState<CastingType[]>(['modele']);
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [ageError, setAgeError] = useState(false);
   const [candidateInfo, setCandidateInfo] = useState<CandidateInfo | null>(null);
+
+  const VIDEO_TYPES = VIDEO_TYPE_KEYS.map((item) => ({
+    ...item,
+    label: t(`type_${item.value}_label` as Parameters<typeof t>[0]),
+    hint:  t(`type_${item.value}_hint`  as Parameters<typeof t>[0]),
+  }));
 
   const hasPendingPlus18 = VIDEO_TYPES.some((c) => pendingTypes.includes(c.value) && c.plus18);
 
@@ -67,19 +69,19 @@ export default function CastingClient() {
             className="relative flex flex-col items-start gap-4 p-7 rounded-2xl border border-zinc-700 bg-zinc-900/60 hover:border-yellow-500/50 hover:bg-yellow-500/5 transition-all text-left group"
           >
             <span className="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/30 text-yellow-400 text-[10px] font-bold uppercase tracking-widest">
-              Recommandé
+              {t('recommended')}
             </span>
             <span className="flex items-center justify-center w-12 h-12 rounded-xl bg-yellow-500/10 text-2xl">
               🎬
             </span>
             <div>
-              <h3 className="text-lg font-bold text-white mb-1.5">Casting Vidéo</h3>
+              <h3 className="text-lg font-bold text-white mb-1.5">{t('video_title')}</h3>
               <p className="text-sm text-zinc-400 leading-relaxed">
-                Enregistrez votre vidéo en suivant les consignes à l&apos;écran. Plus expressif et efficace pour les recruteurs.
+                {t('video_desc')}
               </p>
             </div>
             <span className="inline-flex items-center gap-1 text-xs font-semibold text-yellow-400 group-hover:translate-x-1 transition-transform">
-              Commencer
+              {t('start')}
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -96,13 +98,13 @@ export default function CastingClient() {
               📸
             </span>
             <div>
-              <h3 className="text-lg font-bold text-white mb-1.5">Casting Photo</h3>
+              <h3 className="text-lg font-bold text-white mb-1.5">{t('photo_title')}</h3>
               <p className="text-sm text-zinc-400 leading-relaxed">
-                Soumettez vos meilleures photos et remplissez votre profil pour rejoindre notre réseau.
+                {t('photo_desc')}
               </p>
             </div>
             <span className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 group-hover:text-zinc-300 group-hover:translate-x-1 transition-all">
-              Commencer
+              {t('start')}
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -117,9 +119,9 @@ export default function CastingClient() {
   if (step === 'image-form') {
     return (
       <section className="max-w-2xl mx-auto px-6 pb-24">
-        <BackButton onClick={() => setStep('mode')} />
+        <BackButton onClick={() => setStep('mode')} label={t('back')} />
         <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-8 sm:p-10">
-          <CastingForm submitLabel="Envoyer la candidature" />
+          <CastingForm submitLabel={t('submit_photo')} />
         </div>
       </section>
     );
@@ -129,10 +131,10 @@ export default function CastingClient() {
   if (step === 'video-type') {
     return (
       <section className="max-w-2xl mx-auto px-6 pb-24">
-        <BackButton onClick={() => setStep('mode')} />
+        <BackButton onClick={() => setStep('mode')} label={t('back')} />
         <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-8 sm:p-10 space-y-6">
           <div>
-            <h2 className="text-xl font-bold text-white mb-1">Quels offres vous intéresse ?</h2>
+            <h2 className="text-xl font-bold text-white mb-1">{t('offers_question')}</h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -182,12 +184,12 @@ export default function CastingClient() {
                   className="mt-0.5 h-4 w-4 rounded accent-yellow-500 shrink-0"
                 />
                 <span className="text-sm text-amber-200/80 leading-relaxed">
-                  Je certifie avoir <strong>18 ans ou plus</strong> et j&apos;accepte de participer à ce type de casting en toute connaissance de cause.
+                  {t('age_confirm')}
                 </span>
               </label>
               {ageError && (
                 <p className="mt-2 text-xs text-red-400 pl-7">
-                  Vous devez confirmer votre majorité pour continuer.
+                  {t('age_error')}
                 </p>
               )}
             </div>
@@ -198,7 +200,7 @@ export default function CastingClient() {
             onClick={confirmVideoType}
             className="w-full py-4 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-sm tracking-wide transition-colors shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2"
           >
-            Continuer vers le formulaire
+            {t('continue_form')}
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
@@ -212,11 +214,11 @@ export default function CastingClient() {
   if (step === 'video-info') {
     return (
       <section className="max-w-2xl mx-auto px-6 pb-24">
-        <BackButton onClick={() => setStep('video-type')} />
+        <BackButton onClick={() => setStep('video-type')} label={t('back')} />
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-white mb-1">Vos informations</h2>
+          <h2 className="text-xl font-bold text-white mb-1">{t('info_title')}</h2>
           <p className="text-sm text-zinc-400">
-            Remplissez le formulaire avant de commencer votre casting vidéo.
+            {t('info_subtitle')}
           </p>
         </div>
         <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-8 sm:p-10">
@@ -237,6 +239,7 @@ export default function CastingClient() {
     <section className="max-w-2xl mx-auto px-6 pb-24">
       <BackButton
         onClick={() => setStep('video-info')}
+        label={t('back')}
       />
       <div className="bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden">
         <CastingVideo castingTypes={videoTypes} candidateInfo={candidateInfo} />

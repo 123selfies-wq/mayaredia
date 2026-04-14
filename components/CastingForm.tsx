@@ -7,12 +7,12 @@ import { CldUploadWidget } from 'next-cloudinary';
 
 export type CastingType = 'modele' | 'influenceuse' | 'hotesse' | 'lingerie' | 'glamour';
 
-const TYPE_CARDS: { value: CastingType; emoji: string; label: string; plus18?: boolean }[] = [
-  { value: 'modele',       emoji: '👗', label: 'Modèle' },
-  { value: 'influenceuse', emoji: '✨', label: 'Influenceuse' },
-  { value: 'hotesse',      emoji: '🎤', label: 'Hôtesse' },
-  { value: 'lingerie',     emoji: '🌸', label: 'Maillots / Lingerie', plus18: true },
-  { value: 'glamour',      emoji: '💋', label: 'Modèle Glamour', plus18: true },
+const TYPE_CARD_KEYS: { value: CastingType; emoji: string; plus18?: boolean }[] = [
+  { value: 'modele',       emoji: '👗' },
+  { value: 'influenceuse', emoji: '✨' },
+  { value: 'hotesse',      emoji: '🎤' },
+  { value: 'lingerie',     emoji: '🌸', plus18: true },
+  { value: 'glamour',      emoji: '💋', plus18: true },
 ];
 
 type FormData = {
@@ -61,6 +61,10 @@ type Props = {
 
 export default function CastingForm({ onTypeSelect, hideSections, onSubmitWithData, submitLabel }: Props) {
   const t = useTranslations('form');
+  const TYPE_CARDS = TYPE_CARD_KEYS.map((item) => ({
+    ...item,
+    label: t(`type_${item.value}` as Parameters<typeof t>[0]),
+  }));
   const [uploads, setUploads] = useState<UploadResult[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [ageConfirmed, setAgeConfirmed] = useState(false);
@@ -273,12 +277,12 @@ export default function CastingForm({ onTypeSelect, hideSections, onSubmitWithDa
                   className="mt-0.5 h-4 w-4 rounded accent-yellow-500 cursor-pointer shrink-0"
                 />
                 <span className="text-sm text-amber-200/80 leading-relaxed">
-                  Je certifie avoir <strong>18 ans ou plus</strong> et j&apos;accepte de participer à ce type de casting en toute connaissance de cause.
+                  {t('age_confirm')}
                 </span>
               </label>
               {!ageConfirmed && (
                 <p className="mt-2 text-xs text-red-400 pl-7">
-                  Vous devez confirmer votre majorité pour continuer.
+                  {t('age_error')}
                 </p>
               )}
             </div>
